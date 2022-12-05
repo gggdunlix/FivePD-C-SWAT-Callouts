@@ -118,6 +118,7 @@ namespace FivePDCSWATCallouts
                 passenger4.AlwaysKeepTask = true;
                 passenger4.BlockPermanentEvents = true;
 
+                PedData driverData = await driver.GetData();
                 //does driver have gun?
                 if (RandomUtils.GetRandomNumber(0, 1) == 0)
                 {
@@ -125,54 +126,35 @@ namespace FivePDCSWATCallouts
                     driver.Weapons.Give(WeaponHash.Machete, 1, true, true);
                     driver.Task.FleeFrom(Game.PlayerPed, -1);
                     driver.DrivingStyle = DrivingStyle.AvoidTrafficExtremely;
+                    
+                     //Items
+                    Item knife = new Item();
+                    knife.Name = "Bloody Knife";
+                    knife.IsIllegal = true;
+                    
+                    data.Items.Add(knife);
 
                 }
                 {
                     driver.Weapons.Give(WeaponHash.APPistol, 200, true, true);
                     driver.Task.FleeFrom(Game.PlayerPed, -1);
                     driver.DrivingStyle = DrivingStyle.Rushed;
+                    //Items
+                    Item apPistolItem = new Item();
+                    knife.Name = "Automatic Pistol";
+                    knife.IsIllegal = true;
+                    
+                    data.Items.Add(apPistolItem);
 
                     driver.Task.VehicleShootAtPed(Game.PlayerPed);
                 }
+                driver.SetData(data);
 
             }
             catch
             {
                 EndCallout();
             }
-
-            //Set up Ped Data
-            PedData data = await driver.GetData();
-
-            //Name
-            data.FirstName = "Robert";
-            data.LastName = "Grey";
-
-            //Items
-            Item knife = new Item();
-            knife.Name = "Bloody Knife";
-            knife.IsIllegal = true;
-
-            Item id = new Item();
-            id.Name = "Old cracked id card";
-            id.IsIllegal = false;
-
-            //Clear randomly given items
-            data.Items.Clear();
-
-            //Give created items
-            data.Items.Add(knife);
-            data.Items.Add(id);
-
-            //Set data
-            driver.SetData(data);
-
-            Ped target = AssignedPlayers.FirstOrDefault();
-
-            string clowndialog1 = "~r~Clown~w~: Hello there officer";
-            string clowndialog2 = "~r~Clown~w~: Have you come to play?";
-            string clowndialog3 = "~r~Clown~w~: ~o~Well come here!";
-
 
 
 
