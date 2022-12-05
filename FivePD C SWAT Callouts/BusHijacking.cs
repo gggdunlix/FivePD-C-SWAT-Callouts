@@ -141,8 +141,8 @@ namespace FivePDCSWATCallouts
                     driver.DrivingStyle = DrivingStyle.Rushed;
                     //Items
                     Item apPistolItem = new Item();
-                    knife.Name = "Automatic Pistol";
-                    knife.IsIllegal = true;
+                    apPistolItem.Name = "Automatic Pistol";
+                    apPistolItem.IsIllegal = true;
                     
                     data.Items.Add(apPistolItem);
 
