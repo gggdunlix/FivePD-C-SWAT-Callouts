@@ -3,6 +3,7 @@
   <PropertyGroup>
     <TargetFramework>net472</TargetFramework>
     <RootNamespace>FivePD_C_SWAT_Callouts</RootNamespace>
+    <AssemblyName>SWATCallouts.net</AssemblyName>
   </PropertyGroup>
 
   <ItemGroup>

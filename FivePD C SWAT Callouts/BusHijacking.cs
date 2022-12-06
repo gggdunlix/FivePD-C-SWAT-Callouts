@@ -40,13 +40,13 @@ namespace FivePDCSWATCallouts
         public BusHijacking()
         {
             //Callout location
-            InitInfo(World.GetNextPositionOnStreet(Vector3Extension.Around(Game.PlayerPed.Position, 120f), true));
+            InitInfo(World.GetNextPositionOnStreet(Vector3Extension.Around(Game.PlayerPed.Position, 300f), true));
 
             //Callout Properties
             ShortName = "Bus Hijacking";
             CalloutDescription = "A bus has been hijacked by an unknown individual, and multiple innocent passengers are on board. Respond Code 3.";
             ResponseCode = 3;
-            StartDistance = 60f;
+            StartDistance = 100f;
             Radius = 2f;
         }
 
@@ -77,9 +77,7 @@ namespace FivePDCSWATCallouts
                     PedHash.Clown01SMY,
                     PedHash.CocaineMale01,
                     PedHash.Dealer01SMY,
-                    PedHash.Epsilon01AMY,
                     PedHash.EdToh,
-                    PedHash.Groom,
                     PedHash.Indian01AMY
                 };
                 List<PedHash> peds = new List<PedHash>()
@@ -100,7 +98,13 @@ namespace FivePDCSWATCallouts
                 passenger2 = await SpawnPed(peds.SelectRandom(), Location);
                 passenger3 = await SpawnPed(peds.SelectRandom(), Location);
                 passenger4 = await SpawnPed(peds.SelectRandom(), Location);
-                bus = await SpawnVehicle(VehicleHash.Bus, Location);
+                
+
+                
+                Vector3 lookingAt = World.GetNextPositionOnStreet(new Vector3(Location.X + 2, Location.Y + 2, Location.Z));
+
+                float busHeading = Quaternion.LookAtRH(Location, lookingAt, Location).Angle;
+                bus = await SpawnVehicle(VehicleHash.Bus, Location, busHeading);
                 driver.SetIntoVehicle(bus, VehicleSeat.Driver);
                 passenger1.SetIntoVehicle(bus, VehicleSeat.Any);
                 passenger2.SetIntoVehicle(bus, VehicleSeat.Any);
@@ -118,10 +122,16 @@ namespace FivePDCSWATCallouts
                 passenger4.AlwaysKeepTask = true;
                 passenger4.BlockPermanentEvents = true;
 
+
+                passenger1.Task.Cower(-1);
+                passenger2.Task.Cower(-1);
+                passenger3.Task.Cower(-1);
+                passenger4.Task.Cower(-1);
+
+
                 PedData driverData = await driver.GetData();
                 //does driver have gun?
-                if (RandomUtils.GetRandomNumber(0, 1) == 0)
-                {
+                
                     //Driver does not have gun.
                     driver.Weapons.Give(WeaponHash.Machete, 1, true, true);
                     driver.Task.FleeFrom(Game.PlayerPed, -1);
@@ -132,24 +142,11 @@ namespace FivePDCSWATCallouts
                     knife.Name = "Bloody Knife";
                     knife.IsIllegal = true;
                     
-                    data.Items.Add(knife);
-
-                }
-                {
-                    driver.Weapons.Give(WeaponHash.APPistol, 200, true, true);
-                    driver.Task.FleeFrom(Game.PlayerPed, -1);
-                    driver.DrivingStyle = DrivingStyle.Rushed;
-                    //Items
-                    Item apPistolItem = new Item();
-                    apPistolItem.Name = "Automatic Pistol";
-                    apPistolItem.IsIllegal = true;
-                    
-                    data.Items.Add(apPistolItem);
-
-                    driver.Task.VehicleShootAtPed(Game.PlayerPed);
-                }
-                driver.SetData(data);
-
+                    driverData.Items.Add(knife);
+                Utilities.ExcludeVehicleFromTrafficStop(bus.NetworkId, true);
+                driver.SetData(driverData);
+                FivePD.API.Pursuit.RegisterPursuit(driver);
+                bus.AttachBlip();
             }
             catch
             {
@@ -159,11 +156,17 @@ namespace FivePDCSWATCallouts
 
 
         }
-
+        public async Task shootDrive()
+        {
+            driver.Task.FleeFrom(Game.PlayerPed);
+            Wait(4000);
+            driver.Task.ShootAt(Game.PlayerPed);
+            Wait(2000);
+        }
         public override void OnCancelBefore()
         {
             base.OnCancelBefore();
-
+            Tick -= shootDrive;
             try
             {
                 if (driver.IsAlive && !driver.IsCuffed) { driver.Delete(); }

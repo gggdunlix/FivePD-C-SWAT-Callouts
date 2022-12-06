@@ -15,7 +15,7 @@ namespace FivePDCSWATCallouts
     public class USLAShooting : Callout
     {
         //Declaring the ped variables
-        private Ped terror1_1, terror1_2, terror1_3, terror1_4, terror2_1, terror2_2, terror2_3, terror2_4,;
+        private Ped terror1_1, terror1_2, terror1_3, terror1_4, terror2_1, terror2_2, terror2_3, terror2_4;
         private Vehicle van1, van2;
 
         //List of possible locations
@@ -66,18 +66,25 @@ namespace FivePDCSWATCallouts
                 {
                     PedHash.EdToh
                 };
-                
+
                 List<VehicleHash> vans = new List<VehicleHash>() {
-                    VehicleHash.gburrito,
-                    VehicleHash.
-                }
-                List<WeaponHash> weapons = new List<Weapons>() {
-                    WeaponHash.TearGas,
+                    VehicleHash.Burrito,
+                    VehicleHash.Burrito2,
+                    VehicleHash.GBurrito2,
+                    VehicleHash.Youga,
+                    VehicleHash.Youga2
+                };
+                List<WeaponHash> weapons = new List<WeaponHash>() {
+                    WeaponHash.BZGas,
                     WeaponHash.CarbineRifle,
-                    WeaponHash.AssualtRifleMk2,
+                    WeaponHash.AssaultRifleMk2,
                     WeaponHash.MicroSMG,
-                    
-                }
+                    WeaponHash.Molotov,
+                    WeaponHash.PistolMk2,
+                    WeaponHash.PumpShotgunMk2,
+                    WeaponHash.SpecialCarbineMk2
+
+                };
                 terror1_1 = await SpawnPed(terrorists.SelectRandom(), Location);
                 terror1_2 = await SpawnPed(terrorists.SelectRandom(), Location);
                 terror1_3 = await SpawnPed(terrorists.SelectRandom(), Location);
@@ -85,8 +92,11 @@ namespace FivePDCSWATCallouts
                
                
                 van1 = await SpawnVehicle(vans.SelectRandom(), Location + 3);
-                
-                terror1_1.Weapons.Give(Weap)
+
+                terror1_1.Weapons.Give(weapons.SelectRandom(), 250, true, true);
+                terror1_2.Weapons.Give(weapons.SelectRandom(), 250, true, true);
+                terror1_3.Weapons.Give(weapons.SelectRandom(), 250, true, true);
+                terror1_4.Weapons.Give(weapons.SelectRandom(), 250, true, true);
                 terror1_1.AlwaysKeepTask = true;
                 terror1_1.BlockPermanentEvents = true;
                 terror1_2.AlwaysKeepTask = true;
@@ -97,37 +107,7 @@ namespace FivePDCSWATCallouts
                 terror1_4.BlockPermanentEvents = true;
                 
 
-                PedData driverData = await driver.GetData();
-                //does driver have gun?
-                if (RandomUtils.GetRandomNumber(0, 1) == 0)
-                {
-                    //Driver does not have gun.
-                    driver.Weapons.Give(WeaponHash.Machete, 1, true, true);
-                    driver.Task.FleeFrom(Game.PlayerPed, -1);
-                    driver.DrivingStyle = DrivingStyle.AvoidTrafficExtremely;
-                    
-                     //Items
-                    Item knife = new Item();
-                    knife.Name = "Bloody Knife";
-                    knife.IsIllegal = true;
-                    
-                    data.Items.Add(knife);
-
-                }
-                {
-                    driver.Weapons.Give(WeaponHash.APPistol, 200, true, true);
-                    driver.Task.FleeFrom(Game.PlayerPed, -1);
-                    driver.DrivingStyle = DrivingStyle.Rushed;
-                    //Items
-                    Item apPistolItem = new Item();
-                    apPistolItem.Name = "Automatic Pistol";
-                    apPistolItem.IsIllegal = true;
-                    
-                    data.Items.Add(apPistolItem);
-
-                    driver.Task.VehicleShootAtPed(Game.PlayerPed);
-                }
-                driver.SetData(data);
+                
 
             }
             catch
@@ -145,7 +125,7 @@ namespace FivePDCSWATCallouts
 
             try
             {
-                if (driver.IsAlive && !driver.IsCuffed) { driver.Delete(); }
+                if (terror1_1.IsAlive && !terror1_1.IsCuffed) { terror1_1.Delete(); }
             }
             catch
             { }
