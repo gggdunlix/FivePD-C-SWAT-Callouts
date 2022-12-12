@@ -18,24 +18,11 @@ namespace FivePDCSWATCallouts
         private Ped driver, passenger1, passenger2, passenger3, passenger4;
         private Vehicle bus;
 
-        //List of possible locations
-        /*
-        private List<Vector3> Locations = new List<Vector3>()
-        {
-            new Vector3(2336.882f, 3136.938f, 48.1965f),
-            new Vector3(2707.504f, 4144.324f, 43.8383f),
-            new Vector3(1901.271f, 4912.473f, 48.78623f),
-            new Vector3(-316.1659f, 6313.192f, 32.29678f),
-            new Vector3(-1575.015f, 5162.655f, 19.59452f),
-            new Vector3(403.4432f, 2636.324f, 44.49727f),
-            new Vector3(414.0077f, -1166.904f, 29.29198f),
-            new Vector3(106.2034f, -1813.366f, 26.52958f),
-            new Vector3(908.4533f, -1655.34f, 30.18371f),
-            new Vector3(1071.322f, -711.8113f, 58.47411f),
-            new Vector3(-1024.314f, 368.9541f, 71.36354f),
-            new Vector3(-841.6989f, -1050.529f, 11.29686f)
-        };
-        InitInfo(Locations.SelectRandom());
+
+        /*Callout Credits:
+        Code Written by GGGDunlix
+        Coding assistance given by HuskyNinja99
+        
         */
         public BusHijacking()
         {
@@ -46,7 +33,7 @@ namespace FivePDCSWATCallouts
             ShortName = "Bus Hijacking";
             CalloutDescription = "A bus has been hijacked by an unknown individual, and multiple innocent passengers are on board. Respond Code 3.";
             ResponseCode = 3;
-            StartDistance = 100f;
+            StartDistance = 150f;
             Radius = 2f;
         }
 
@@ -103,8 +90,9 @@ namespace FivePDCSWATCallouts
                 
                 Vector3 lookingAt = World.GetNextPositionOnStreet(new Vector3(Location.X + 2, Location.Y + 2, Location.Z));
 
-                float busHeading = Quaternion.LookAtRH(Location, lookingAt, Location).Angle;
+                float busHeading = GetHeadingFromVector_2d((Location.X - lookingAt.X), (Location.Y - lookingAt.Y));
                 bus = await SpawnVehicle(VehicleHash.Bus, Location, busHeading);
+                await BaseScript.Delay(1000);
                 driver.SetIntoVehicle(bus, VehicleSeat.Driver);
                 passenger1.SetIntoVehicle(bus, VehicleSeat.Any);
                 passenger2.SetIntoVehicle(bus, VehicleSeat.Any);
@@ -147,6 +135,7 @@ namespace FivePDCSWATCallouts
                 driver.SetData(driverData);
                 FivePD.API.Pursuit.RegisterPursuit(driver);
                 bus.AttachBlip();
+                
             }
             catch
             {
@@ -156,17 +145,11 @@ namespace FivePDCSWATCallouts
 
 
         }
-        public async Task shootDrive()
-        {
-            driver.Task.FleeFrom(Game.PlayerPed);
-            Wait(4000);
-            driver.Task.ShootAt(Game.PlayerPed);
-            Wait(2000);
-        }
+        
         public override void OnCancelBefore()
         {
             base.OnCancelBefore();
-            Tick -= shootDrive;
+            
             try
             {
                 if (driver.IsAlive && !driver.IsCuffed) { driver.Delete(); }
