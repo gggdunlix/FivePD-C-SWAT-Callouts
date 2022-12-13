@@ -17,7 +17,7 @@ namespace FivePDCSWATCallouts
         //Declaring the ped variables
         private Ped terror1_1, terror1_2, terror1_3, terror1_4, terror2_1, terror2_2, terror2_3, terror2_4;
         private Vehicle van1, van2;
-        private bool phase1, phase2;
+        private bool phase1, phase2a, phase2b;
 
 
         //List of possible locations
@@ -122,12 +122,19 @@ namespace FivePDCSWATCallouts
                 terror1_4.AlwaysKeepTask = true;
                 terror1_4.BlockPermanentEvents = true;
 
+                phase1 = true;
+                phase2a = false;
+                phase2b = false;
+
+                Tick += Phase1Shootout;
+
 
 
 
             }
             catch
             {
+                Debug.WriteLine("There was an error with the USLA Shooting Callout. It has been terminated.")
                 EndCallout();
             }
 
@@ -145,6 +152,9 @@ namespace FivePDCSWATCallouts
             {
                 await BaseScript.Delay(1000);
                 await AttackNearestPed(terror1_1, 100f, terroristPeds);
+                await AttackNearestPed(terror1_2, 100f, terroristPeds);
+                await AttackNearestPed(terror1_3, 100f, terroristPeds);
+                await AttackNearestPed(terror1_4, 100f, terroristPeds);
             }
             else
             {
@@ -152,7 +162,7 @@ namespace FivePDCSWATCallouts
             }
             if ((terror1_1.IsDead || terror1_1.IsCuffed) && (terror1_2.IsDead || terror1_2.IsCuffed) && (terror1_2.IsDead || terror1_2.IsCuffed) && (terror1_3.IsDead || terror1_3.IsCuffed) && (terror1_4.IsDead || terror1_4.IsCuffed))
             {
-                phase2 = true;
+                phase2a = true;
                 phase1 = false;
             }
 
@@ -164,10 +174,68 @@ namespace FivePDCSWATCallouts
             {
                 terror1_1, terror1_2, terror1_3, terror1_4, terror2_1, terror2_2, terror2_3, terror2_4
             };
-            if (phase1)
+            if (phase2a) {
+                List<PedHash> terrorists = new List<PedHash>()
+                {
+                    PedHash.EdToh,
+                    PedHash.Armoured01,
+                    PedHash.Armoured02SMM,
+                    PedHash.GunVend01,
+                    PedHash.Bouncer01SMM
+
+                };
+
+                List<VehicleHash> vans = new List<VehicleHash>() {
+                    VehicleHash.Burrito,
+                    VehicleHash.Burrito2,
+                    VehicleHash.GBurrito2,
+                    VehicleHash.Youga,
+                    VehicleHash.Youga2
+                };
+                List<WeaponHash> weapons = new List<WeaponHash>() {
+                    WeaponHash.BZGas,
+                    WeaponHash.CarbineRifle,
+                    WeaponHash.AssaultRifleMk2,
+                    WeaponHash.MicroSMG,
+                    WeaponHash.Molotov,
+                    WeaponHash.PistolMk2,
+                    WeaponHash.PumpShotgunMk2,
+                    WeaponHash.SpecialCarbineMk2
+
+                };
+                terror2_1 = await SpawnPed(terrorists.SelectRandom(), Location);
+                terror2_2 = await SpawnPed(terrorists.SelectRandom(), Location);
+                terror2_3 = await SpawnPed(terrorists.SelectRandom(), Location);
+                terror2_4 = await SpawnPed(terrorists.SelectRandom(), Location);
+
+
+                van2 = await SpawnVehicle(vans.SelectRandom(), World.GetNextPositionOnStreet(Location + 5));
+
+                terror2_1.SetIntoVehicle(van1, VehicleSeat.Driver);
+                terror2_2.SetIntoVehicle(van1, VehicleSeat.Any);
+                terror2_3.SetIntoVehicle(van1, VehicleSeat.Any);
+                terror2_4.SetIntoVehicle(van1, VehicleSeat.Any);
+
+                terror2_1.Weapons.Give(weapons.SelectRandom(), 250, true, true);
+                terror2_2.Weapons.Give(weapons.SelectRandom(), 250, true, true);
+                terror2_3.Weapons.Give(weapons.SelectRandom(), 250, true, true);
+                terror2_4.Weapons.Give(weapons.SelectRandom(), 250, true, true);
+                terror2_1.AlwaysKeepTask = true;
+                terror2_1.BlockPermanentEvents = true;
+                terror2_2.AlwaysKeepTask = true;
+                terror2_2.BlockPermanentEvents = true;
+                terror2_3.AlwaysKeepTask = true;
+                terror2_3.BlockPermanentEvents = true;
+                terror2_4.AlwaysKeepTask = true;
+                terror2_4.BlockPermanentEvents = true;
+            }
+            if (phase2b)
             {
                 await BaseScript.Delay(1000);
-                await AttackNearestPed(terror1_1, 100f, terroristPeds);
+                await AttackNearestPed(terror2_1, 100f, terroristPeds);
+                await AttackNearestPed(terror2_2, 100f, terroristPeds);
+                await AttackNearestPed(terror2_3, 100f, terroristPeds);
+                await AttackNearestPed(terror2_4, 100f, terroristPeds);
             }
             else
             {
