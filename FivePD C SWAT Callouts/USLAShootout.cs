@@ -17,7 +17,7 @@ namespace FivePDCSWATCallouts
         //Declaring the ped variables
         private Ped terror1_1, terror1_2, terror1_3, terror1_4, terror2_1, terror2_2, terror2_3, terror2_4;
         private Vehicle van1, van2;
-        private bool phase1, phase2a, phase2b;
+        private bool phase1, phase2a, phase2b phase2spawned;
 
 
         //List of possible locations
@@ -174,7 +174,7 @@ namespace FivePDCSWATCallouts
             {
                 terror1_1, terror1_2, terror1_3, terror1_4, terror2_1, terror2_2, terror2_3, terror2_4
             };
-            if (phase2a) {
+            if (phase2a && !phase2spawned) {
                 List<PedHash> terrorists = new List<PedHash>()
                 {
                     PedHash.EdToh,
@@ -211,10 +211,10 @@ namespace FivePDCSWATCallouts
 
                 van2 = await SpawnVehicle(vans.SelectRandom(), World.GetNextPositionOnStreet(Location + 5));
 
-                terror2_1.SetIntoVehicle(van1, VehicleSeat.Driver);
-                terror2_2.SetIntoVehicle(van1, VehicleSeat.Any);
-                terror2_3.SetIntoVehicle(van1, VehicleSeat.Any);
-                terror2_4.SetIntoVehicle(van1, VehicleSeat.Any);
+                terror2_1.SetIntoVehicle(van2, VehicleSeat.Driver);
+                terror2_2.SetIntoVehicle(van2, VehicleSeat.Any);
+                terror2_3.SetIntoVehicle(van2, VehicleSeat.Any);
+                terror2_4.SetIntoVehicle(van2, VehicleSeat.Any);
 
                 terror2_1.Weapons.Give(weapons.SelectRandom(), 250, true, true);
                 terror2_2.Weapons.Give(weapons.SelectRandom(), 250, true, true);
@@ -228,6 +228,23 @@ namespace FivePDCSWATCallouts
                 terror2_3.BlockPermanentEvents = true;
                 terror2_4.AlwaysKeepTask = true;
                 terror2_4.BlockPermanentEvents = true;
+
+                phase2spawned = true;
+                
+                terror2_1.Task.DriveTo(van2, van1.Position, 15f, 30, 786468);
+            }
+            if (phase2spawned) {
+                if (van2.IsInRangeOf(van1.Position, 25f) && van1.Speed < 10) {
+                    terror2_1.Task.ExitVehicle();
+                    terror2_2.Task.ExitVehicle();
+                    terror2_3.Task.ExitVehicle();
+                    terror2_4.Task.ExitVehicle();
+                    BaseScript.Delay(1000);
+                    if (!terror2_1.IsInVehicle()) {
+                        AttackNearestPed(terror2_2)
+                        //NEEDS FIXING!
+                    }
+                }
             }
             if (phase2b)
             {
