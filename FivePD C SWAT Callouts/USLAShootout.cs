@@ -17,7 +17,8 @@ namespace FivePDCSWATCallouts
         //Declaring the ped variables
         private Ped terror1_1, terror1_2, terror1_3, terror1_4, terror2_1, terror2_2, terror2_3, terror2_4;
         private Vehicle van1, van2;
-        private bool phase1, phase2a, phase2b phase2spawned;
+        private bool phase1, phase2a;
+        private bool phase2b, phase2spawned;
 
 
         //List of possible locations
@@ -29,8 +30,15 @@ namespace FivePDCSWATCallouts
         private List<Vector3> Locations = new List<Vector3>()
         {
             //NEED TO GET USLA COLLEGE LOCATIONS
-            new Vector3(2336.882f, 3136.938f, 48.1965f),
-            new Vector3(2707.504f, 4144.324f, 43.8383f)
+            new Vector3(-1736.077f, 161.913f, 64.37097f),
+            new Vector3(-1692.991f, 195.0446f, 63.8455f),
+            new Vector3(-1646.493f, 145.7752f, 62.07328f),
+            new Vector3(-1614.085f, 183.8651f, 59.85993f),
+            new Vector3(-1622.292f, 221.009f, 60.28655f),
+            new Vector3(-1736.575f, 242.3569f, 65.11923f),
+            new Vector3(-1664.675f, 264.3767f, 62.39096f),
+            new Vector3(-1537.373f, 220.9161f, 60.09211f)
+
 
         };
 
@@ -125,7 +133,7 @@ namespace FivePDCSWATCallouts
                 phase1 = true;
                 phase2a = false;
                 phase2b = false;
-
+                Debug.WriteLine("Started ticking!");
                 Tick += Phase1Shootout;
 
 
@@ -134,7 +142,7 @@ namespace FivePDCSWATCallouts
             }
             catch
             {
-                Debug.WriteLine("There was an error with the USLA Shooting Callout. It has been terminated.")
+                Debug.WriteLine("There was an error with the USLA Shooting Callout. It has been terminated.");
                 EndCallout();
             }
 
@@ -235,14 +243,17 @@ namespace FivePDCSWATCallouts
             }
             if (phase2spawned) {
                 if (van2.IsInRangeOf(van1.Position, 25f) && van1.Speed < 10) {
-                    terror2_1.Task.ExitVehicle();
-                    terror2_2.Task.ExitVehicle();
-                    terror2_3.Task.ExitVehicle();
-                    terror2_4.Task.ExitVehicle();
+                    terror2_1.Task.LeaveVehicle();
+                    terror2_2.Task.LeaveVehicle();
+                    terror2_3.Task.LeaveVehicle();
+                    terror2_4.Task.LeaveVehicle();
                     BaseScript.Delay(1000);
                     if (!terror2_1.IsInVehicle()) {
-                        AttackNearestPed(terror2_2)
-                        //NEEDS FIXING!
+                        await AttackNearestPed(terror2_2, 100f, terroristPeds);
+                        await AttackNearestPed(terror2_2, 100f, terroristPeds);
+                        await AttackNearestPed(terror2_2, 100f, terroristPeds);
+                        await AttackNearestPed(terror2_2, 100f, terroristPeds);
+                        phase2b = true;
                     }
                 }
             }
@@ -254,15 +265,7 @@ namespace FivePDCSWATCallouts
                 await AttackNearestPed(terror2_3, 100f, terroristPeds);
                 await AttackNearestPed(terror2_4, 100f, terroristPeds);
             }
-            else
-            {
-                Tick += Phase2Shootout;
-            }
-            if ((terror1_1.IsDead || terror1_1.IsCuffed) && (terror1_2.IsDead || terror1_2.IsCuffed) && (terror1_2.IsDead || terror1_2.IsCuffed) && (terror1_3.IsDead || terror1_3.IsCuffed) && (terror1_4.IsDead || terror1_4.IsCuffed))
-            {
-                phase2 = true;
-                phase1 = false;
-            }
+            
         }
         public async Task AttackNearestPed(Ped attacker, float radius, List<Ped> ignoreThem)
         {
