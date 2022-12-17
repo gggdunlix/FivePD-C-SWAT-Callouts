@@ -116,6 +116,8 @@ namespace FivePDCSWATCallouts
                 passenger3.Task.Cower(-1);
                 passenger4.Task.Cower(-1);
 
+                //fix them cowering under seats
+
 
                 PedData driverData = await driver.GetData();
                 //does driver have gun?

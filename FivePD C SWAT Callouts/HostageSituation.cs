@@ -34,7 +34,9 @@ namespace FivePDCSWATCallouts
         public HostageSituation()
         {
             //Callout location
-            InitInfo(Locations.OrderBy(x => World.GetDistance(x.Position, Game.PlayerPed.Position)));
+            Vector3 location = Locations.OrderBy(x => World.GetDistance(x, Game.PlayerPed.Position)).Skip(1).First();
+
+            InitInfo(location);
             //Callout Properties
             ShortName = "Hostage Situation";
             CalloutDescription = "There is a hostage held at gunpoint at the location. Respond Code 3.";
@@ -112,7 +114,7 @@ namespace FivePDCSWATCallouts
             }
             catch
             {
-                Debug.WriteLine("There was an error with the Hostage Situation Callout. It has been terminated.")
+                Debug.WriteLine("There was an error with the Hostage Situation Callout. It has been terminated.");
                 EndCallout();
             }
 

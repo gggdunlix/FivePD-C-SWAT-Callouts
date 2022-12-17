@@ -134,6 +134,11 @@ namespace FivePDCSWATCallouts
                 phase2a = false;
                 phase2b = false;
                 Debug.WriteLine("Started ticking!");
+                terror1_1.Task.LeaveVehicle();
+                terror1_2.Task.LeaveVehicle();
+                terror1_3.Task.LeaveVehicle();
+                terror1_4.Task.LeaveVehicle();
+
                 Tick += Phase1Shootout;
 
 
@@ -152,6 +157,7 @@ namespace FivePDCSWATCallouts
         }
         public async Task Phase1Shootout()
         {
+            await BaseScript.Delay(2000);
             List<Ped> terroristPeds = new List<Ped>
             {
                 terror1_1, terror1_2, terror1_3, terror1_4, terror2_1, terror2_2, terror2_3, terror2_4
@@ -269,7 +275,8 @@ namespace FivePDCSWATCallouts
         }
         public async Task AttackNearestPed(Ped attacker, float radius, List<Ped> ignoreThem)
         {
-            Array allPeds = World.GetAllPeds();
+
+            List<Ped> allPeds = World.GetAllPeds().ToList();
 
             List<Ped> attackablePeds = new List<Ped>();
             foreach (Ped p in allPeds)
@@ -280,6 +287,7 @@ namespace FivePDCSWATCallouts
                 }
             }
             attackablePeds.OrderBy(x => World.GetDistance(x.Position, attacker.Position));
+            await BaseScript.Delay(2500);
             attacker.Task.FightAgainst(attackablePeds.First());
 
         }
