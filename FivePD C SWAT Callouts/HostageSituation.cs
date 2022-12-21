@@ -122,7 +122,12 @@ namespace FivePDCSWATCallouts
 
 
         }
-        
+        public async Task StartSituation() {
+            if (Game.PlayerPed.IsInRangeOf(Location, 10f)) {
+                int rnd = new RandomUtils.Random();
+                
+            }
+        }
         public override void OnCancelBefore()
         {
             base.OnCancelBefore();
