@@ -21,7 +21,7 @@ namespace FivePDCSWATCallouts
         
         /* Callout Credits:+
          * Code written by GGGDunlix
-         * Ideas and inspiration by Platinum Dev and Commodore
+         * GET THE CALLOUT IDEA CREATORS
          */
 //List of possible locations
         private List<Vector3> Locations = new List<Vector3>()
@@ -118,15 +118,45 @@ namespace FivePDCSWATCallouts
                 EndCallout();
             }
 
-
+//                  All Ped Scanarios need to check if the suspect has a weapon before the task is executed, or else holding E will not stop them!
+//              -----------------------------------------------------------------------------------------------------------------------------------------------
 
 
         }
         public async Task StartSituation() {
             if (Game.PlayerPed.IsInRangeOf(Location, 10f)) {
-                int rnd = new RandomUtils.Random();
-                
+                // 33% chance suspects shoot the hostage on arrival, 33%chance hostage gets up and runs away,
+                // 33% chance suspects don't ever shoot hostage and it stays, just attack player
+                int rnd = new RandomUtils.Random(1, 3);
+                if (rnd = 1) {
+                    Tick += outcome1;
+                } else if (rnd = 2) {
+                    Tick += outcome2;
+                } else {
+                    Tick += outcome3;
+                }
             }
+        }
+        public async Task outcome1() {
+            if (hostage.IsAlive()) {
+                suspect1.Task.FightAgainst(hostage);
+                suspect2.Task.FightAgainst(hostage);
+                suspect3.Task.FightAgainst(hostage);
+            } else {
+                suspect1.Task.FightAgainst(Game.PlayerPed);
+                suspect2.Task.FightAgainst(Game.PlayerPed);
+                suspect3.Task.FightAgainst(Game.PlayerPed);
+            }
+
+        }
+        public async Task outcome2() {
+            hostage.Task.FleeFrom(suspect1);
+            suspect1.Task.FightAgainst(Game.PlayerPed);
+            suspect2.Task.FightAgainst(Game.PlayerPed);
+            suspect3.Task.FightAgainst(Game.PlayerPed);
+        }
+        public async Task outcome3() {
+            
         }
         public override void OnCancelBefore()
         {
